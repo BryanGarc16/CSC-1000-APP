@@ -40,7 +40,8 @@ const addUser = (user) => {
   return user;
 };
 
-const deleteUser = (user) =>{
+const deleteUser = (id) => {
+  let user = findUserById(id);
   users["users_list"].pop(user);
   return user;
 };
@@ -49,7 +50,7 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
-const findUserByJob = (job) =>{
+const findUserByJob = (job) => {
   return users["users_list"].filter((user) => user["job"] === job);
 };
 
@@ -65,8 +66,9 @@ app.get("/users", (req, res) => {
   const job = req.query.job;
   if (name != undefined) {
     let result = findUserByName(name);
-    if(job != undefined){
-      result = findUserByJob(job);}
+    if (job != undefined) {
+      result = findUserByJob(job);
+    }
     result = { users_list: result };
     res.send(result);
   } else {
@@ -90,14 +92,12 @@ app.post("/users", (req, res) => {
   res.send();
 });
 
-app.delete("/users", (req,res)=> {
+app.delete("/users", (req, res) => {
   const userToDel = req.body;
   deleteUser(userToDel);
   res.send();
-})
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
-
-
