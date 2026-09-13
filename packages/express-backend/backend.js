@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
@@ -33,9 +34,28 @@ const users = {
   ],
 };
 
+app.use(cors());
 app.use(express.json());
 
+const createID = () => {
+  let newID = "";
+  for (let ii = 0; ii < 3; ii++) {
+    newID += String.fromCharCode(
+      Math.floor(Math.random() * (122 - 97 + 1)) + 97,
+    );
+  }
+  for (let ii = 0; ii < 3; ii++) {
+    newID += String.fromCharCode(
+      Math.floor(Math.random() * (57 - 48 + 1)) + 48,
+    );
+  }
+  return newID;
+};
+
 const addUser = (user) => {
+  if (user.id == undefined | user.id == ""){
+    user.id = createID();
+  }
   users["users_list"].push(user);
   return user;
 };
@@ -96,6 +116,17 @@ app.delete("/users", (req, res) => {
   const userToDel = req.body;
   deleteUser(userToDel);
   res.send();
+});
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"]; //or req.params.id
+  let result = findUserById(id);
+  if (result === undefined) {
+    res.status(404).send("Resource not found.");
+  } else {
+    deleteUser(result);
+    res.send();
+  }
 });
 
 app.listen(port, () => {
