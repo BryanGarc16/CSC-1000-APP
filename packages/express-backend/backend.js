@@ -53,7 +53,7 @@ const createID = () => {
 };
 
 const addUser = (user) => {
-  if (user.id == undefined | user.id == ""){
+  if (user.id == undefined || user.id == ""){
     user.id = createID();
   }
   users["users_list"].push(user);
@@ -61,9 +61,10 @@ const addUser = (user) => {
 };
 
 const deleteUser = (id) => {
-  let user = findUserById(id);
-  users["users_list"].pop(user);
-  return user;
+  const index = users["users_list"].findIndex((user) => user["id"] === id);
+  if (index === -1) return undefined;
+  const [deleted] = users["users_list"].splice(index, 1);
+  return deleted;
 };
 
 const findUserByName = (name) => {
@@ -109,23 +110,28 @@ app.get("/users/:id", (req, res) => {
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
-  res.send();
+  res.status(201).send(userToAdd);
 });
 
 app.delete("/users", (req, res) => {
   const userToDel = req.body;
-  deleteUser(userToDel);
-  res.send();
+  const deleted = deleteUser(userToDel.id);
+  if (deleted === undefined) {
+    res.status(404).send("Resource not found.");
+  } else 
+  {
+  res.status(204).send();
+  }
 });
 
 app.delete("/users/:id", (req, res) => {
-  const id = req.params["id"]; //or req.params.id
-  let result = findUserById(id);
-  if (result === undefined) {
+  const id = req.params["id"]; 
+  let deleted = deleteUser(id);
+  if (deleted === undefined) {
     res.status(404).send("Resource not found.");
-  } else {
-    deleteUser(result);
-    res.send();
+  } else 
+  {
+    res.status(204).send();
   }
 });
 
