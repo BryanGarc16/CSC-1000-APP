@@ -105,17 +105,24 @@ app.post("/users", (req, res) => {
     });
 });
 
-/*
+
 app.delete("/users", (req, res) => {
   const userToDel = req.body;
-  const deleted = deleteUser(userToDel.id);
-  if (deleted === undefined) {
-    res.status(404).send("Resource not found.");
-  } else {
-    res.status(204).send();
-  }
+  userService
+    .removeUser(userToDel.id)
+    .then((deleted) => {
+      if (deleted === null || deleted === undefined) {
+        res.status(404).send("Resource not found.");
+      } else {
+        res.status(204).send();
+      }
+    })
+    .catch((error) => {
+      res.status(500).send(error.message);
+    });
 });
-*/
+
+
 app.delete("/users/:id", (req, res) => {
   const id = req.params["id"];
   userService
